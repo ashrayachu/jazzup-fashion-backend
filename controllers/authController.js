@@ -32,17 +32,26 @@ const login = async (req, res) => {
         if (!isMatch) return res.status(401).json({ message: "Invalid credentials" });
 
         const token = jwt.sign(
-            { id: user._id, email: user.email, role:user.role },
+            { id: user._id, email: user.email, role: user.role },
             process.env.JWT_SECRET,
-            { expiresIn: process.env.JWT_EXPIRES_IN || "15min" }
+            { expiresIn: process.env.JWT_EXPIRES_IN || "7d" }
         );
 
-        res.json({ message: "Login successful", token });
+        // Convert Mongoose document to plain object
+        const userData = user.toObject();
+        delete userData.password; // remove password field
+
+        res.json({
+            message: "Login successful",
+            token,
+            user: userData,
+        });
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: "Server error" });
     }
 };
+
 
 const getProfile = async (req, res) => {
     try {

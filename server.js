@@ -5,18 +5,26 @@ const helmet = require("helmet");
 const morgan = require("morgan");
 const { connectDb } = require("./config/db");
 const authRouter = require("./routes/authRoutes");
+const adminRouter = require("./routes/admin/productsRoute")
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middlewares
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+    origin: ["http://localhost:5173"],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true
+}));
 app.use(helmet());
 app.use(morgan("dev"));
 
 // Routes
 app.use("/api/auth", authRouter);
+app.use("/api/admin", adminRouter);
+
 
 // Default Route
 app.get("/", (req, res) => {
