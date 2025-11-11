@@ -1,7 +1,10 @@
+# Environment files
 .env
-node_modules/
 .env.local
-.env.development.local
-.env.test.local
-.env.production.local
+.env.*.local
+
+# Dependencies
+node_modules/
+
+# OS files
 .DS_Store
