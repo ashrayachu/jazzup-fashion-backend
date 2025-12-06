@@ -269,8 +269,122 @@ const CatergoryList = async (req, res) => {
 
 
 
+
+const getSingleProduct = async (req, res) => {
+   try {
+      const { id } = req.params;
+      const product = await Product.findById(id).populate('category', 'name');
+
+      if (!product) {
+         return res.status(404).json({
+            success: false,
+            message: "Product not found"
+         });
+      }
+
+      res.status(200).json({
+         success: true,
+         product
+      });
+   } catch (error) {
+      console.error("Error fetching product:", error);
+      res.status(500).json({
+         success: false,
+         message: "Error fetching product",
+         error: error.message
+      });
+   }
+};
+
+
+const updateProduct = async (req, res) => {
+   try {
+      const { id } = req.params;
+      const formData = req.body;
+
+      console.log("Form data in UPDATE Product route:", formData);
+      console.log("Uploaded files:", req.files);
+
+      const product = await Product.findById(id);
+      if (!product) {
+         return res.status(404).json({
+            success: false,
+            message: "Product not found"
+         });
+      }
+
+      // 1. Handle New Image Uploads (same logic as create)
+      const variantImages = {};
+      if (req.files && req.files.length > 0) {
+         req.files.forEach(file => {
+            const match = file.fieldname.match(/variant_(\d+)_image_\d+/);
+            if (match) {
+               const variantIndex = parseInt(match[1]);
+               if (!variantImages[variantIndex]) {
+                  variantImages[variantIndex] = [];
+               }
+               variantImages[variantIndex].push(file.location);
+            }
+         });
+      }
+
+      // 2. Update Basic Fields
+      if (formData.name) product.name = formData.name;
+      if (formData.brand) product.brand = formData.brand;
+      if (formData.categoryId) product.category = formData.categoryId;
+      if (formData.subCategory) product.subCategory = formData.subCategory;
+      if (formData.price) product.price = formData.price;
+      if (formData.description) product.description = formData.description;
+      if (formData.sizeType) product.sizeType = formData.sizeType;
+      if (formData.fabric) product.fabric = formData.fabric;
+      if (formData.fitType) product.fitType = formData.fitType;
+      if (formData.sleeveType) product.sleeveType = formData.sleeveType;
+
+      // 3. Update Variants
+      if (formData.variants) {
+         const parsedVariants = JSON.parse(formData.variants);
+
+         // We assume the verified client sends the COMPLETE state of variants,
+         // but we need to merge the *newly uploaded* images into that state.
+         // 'parsedVariants' from body might contain existing image URLs.
+         // 'variantImages' contains NEW image URLs from this upload.
+
+         const updatedVariants = parsedVariants.map((variant, index) => {
+            const newImages = variantImages[index] || [];
+            // Combine existing images (if sent back) with new uploaded images
+            // Note: The frontend must send back existing images in the 'images' array if they are to be kept.
+            const existingImages = variant.images || [];
+            return {
+               color: variant.color,
+               colorCode: variant.colorCode,
+               sizes: variant.sizes,
+               images: [...existingImages, ...newImages]
+            };
+         });
+
+         product.variants = updatedVariants;
+      }
+
+      const updatedProduct = await product.save();
+
+      res.status(200).json({
+         success: true,
+         message: "Product updated successfully",
+         product: updatedProduct
+      });
+
+   } catch (error) {
+      console.error("Error updating product:", error);
+      res.status(500).json({
+         success: false,
+         message: "Error updating product",
+         error: error.message
+      });
+   }
+};
+
 module.exports = {
-   createProduct, AddCategory, CatergoryList, getProducts
+   createProduct, AddCategory, CatergoryList, getProducts, getSingleProduct, updateProduct
 };
 
 
