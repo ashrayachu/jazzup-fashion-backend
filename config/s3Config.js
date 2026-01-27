@@ -23,6 +23,10 @@ const uploadS3 = multer({
             cb(null, `uploads/${Date.now().toString()}_${file.originalname}`);
         },
     }),
+    limits: {
+        fileSize: 5 * 1024 * 1024, // 5 MB per file
+        files: 10, // Maximum 10 files
+    },
 });
 
 module.exports = uploadS3;

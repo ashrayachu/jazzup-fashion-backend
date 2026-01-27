@@ -302,8 +302,8 @@ const updateProduct = async (req, res) => {
       const { id } = req.params;
       const formData = req.body;
 
-      console.log("Form data in UPDATE Product route:", formData);
-      console.log("Uploaded files:", req.files);
+      // console.log("Form data in UPDATE Product route:", formData);
+      // console.log("Uploaded files:", req.files);
 
       const product = await Product.findById(id);
       if (!product) {
@@ -353,7 +353,9 @@ const updateProduct = async (req, res) => {
             const newImages = variantImages[index] || [];
             // Combine existing images (if sent back) with new uploaded images
             // Note: The frontend must send back existing images in the 'images' array if they are to be kept.
-            const existingImages = variant.images || [];
+            const existingImages = variant.existingImages || [];
+            console.log("Existing images:", existingImages);
+            console.log("New images:", newImages);
             return {
                color: variant.color,
                colorCode: variant.colorCode,
