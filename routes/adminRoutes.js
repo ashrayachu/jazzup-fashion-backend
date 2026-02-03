@@ -1,8 +1,8 @@
 const express = require("express");
-const { verifyAdmin } = require("../../middleware/auth");
-const { createProduct } = require("../../controllers/productController");
-const uploadS3 = require("../../config/s3Config");
-const { AddCategory, CatergoryList, getProducts, getSingleProduct, updateProduct } = require("../../controllers/productController");
+const { verifyAdmin } = require("../middleware/auth");
+const { createProduct } = require("../controllers/productController");
+const uploadS3 = require("../config/s3Config");
+const { AddCategory, CatergoryList, getProducts, getSingleProduct, updateProduct } = require("../controllers/productController");
 
 const router = express.Router();
 

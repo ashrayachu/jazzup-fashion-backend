@@ -25,6 +25,11 @@ const productSchema = new mongoose.Schema(
         fabric: { type: String },
         fitType: { type: String },
         sleeveType: { type: String },
+        collections: {
+            type: [String],
+            enum: ['New Arrivals', 'Best Sellers', 'Featured', 'Sale', 'Summer Collection', 'Winter Collection', 'Trending', 'Premium'],
+            default: []
+        },
         variants: [variantSchema],
     },
     { timestamps: true }

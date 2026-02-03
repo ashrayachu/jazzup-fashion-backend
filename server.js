@@ -5,7 +5,8 @@ const helmet = require("helmet");
 const morgan = require("morgan");
 const { connectDb } = require("./config/db");
 const authRouter = require("./routes/authRoutes");
-const adminRouter = require("./routes/admin/productsRoute")
+const adminRouter = require("./routes/adminRoutes");
+const userRouter = require("./routes/userRoutes");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -24,6 +25,7 @@ app.use(morgan("dev"));
 // Routes
 app.use("/api/auth", authRouter);
 app.use("/api/admin", adminRouter);
+app.use("/api", userRouter);
 
 
 // Default Route

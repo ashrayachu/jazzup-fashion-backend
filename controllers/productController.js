@@ -64,6 +64,7 @@ const createProduct = async (req, res) => {
          fabric: formData.fabric || '',
          fitType: formData.fitType || '',
          sleeveType: formData.sleeveType || '',
+         collections: formData.collections ? JSON.parse(formData.collections) : [],
          variants: variantsWithImages
       });
 
@@ -101,6 +102,7 @@ const getProducts = async (req, res) => {
          sleeveType,
          color,
          size,
+         collections,
          sortBy = 'createdAt',
          sortOrder = 'desc',
          page = 1,
@@ -161,6 +163,11 @@ const getProducts = async (req, res) => {
       // Size filter (searches within variants)
       if (size) {
          filter['variants.sizes.size'] = { $regex: size, $options: 'i' };
+      }
+
+      // Collections filter
+      if (collections) {
+         filter.collections = { $in: Array.isArray(collections) ? collections : [collections] };
       }
 
       // Search filter (searches in name and description)
@@ -339,6 +346,7 @@ const updateProduct = async (req, res) => {
       if (formData.fabric) product.fabric = formData.fabric;
       if (formData.fitType) product.fitType = formData.fitType;
       if (formData.sleeveType) product.sleeveType = formData.sleeveType;
+      if (formData.collections) product.collections = JSON.parse(formData.collections);
 
       // 3. Update Variants
       if (formData.variants) {
@@ -385,8 +393,56 @@ const updateProduct = async (req, res) => {
    }
 };
 
+const getCollectionProducts = async (req, res) => {
+   try {
+      const { collection } = req.params;
+
+      // Map URL-friendly names to database enum values
+      const collectionMap = {
+         'newarrivals': 'New Arrivals',
+         'bestsellers': 'Best Sellers',
+         'featured': 'Featured',
+         'sale': 'Sale',
+         'summercollection': 'Summer Collection',
+         'wintercollection': 'Winter Collection',
+         'trending': 'Trending',
+         'premium': 'Premium'
+      };
+
+      // Convert URL param to lowercase and remove spaces/hyphens
+      const normalizedParam = collection.toLowerCase().replace(/[-\s]/g, '');
+      const dbCollectionName = collectionMap[normalizedParam];
+
+      if (!dbCollectionName) {
+         return res.status(400).json({
+            success: false,
+            message: `Invalid collection name: ${collection}. Valid collections: ${Object.keys(collectionMap).join(', ')}`
+         });
+      }
+
+      // Use case-insensitive regex search for flexibility
+      const products = await Product.find({
+         collections: { $regex: new RegExp(`^${dbCollectionName}$`, 'i') }
+      }).populate('category', 'name');
+
+      res.status(200).json({
+         success: true,
+         collection: dbCollectionName,
+         count: products.length,
+         data: products
+      });
+   } catch (error) {
+      console.error("Error fetching collection products:", error);
+      res.status(500).json({
+         success: false,
+         message: "Error fetching collection products",
+         error: error.message
+      });
+   }
+};
+
 module.exports = {
-   createProduct, AddCategory, CatergoryList, getProducts, getSingleProduct, updateProduct
+   createProduct, AddCategory, CatergoryList, getProducts, getCollectionProducts, getSingleProduct, updateProduct, getCollectionProducts
 };
 
 
