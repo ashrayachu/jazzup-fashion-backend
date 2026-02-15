@@ -1,16 +1,22 @@
 {
   "dependencies": {
     "@aws-sdk/client-s3": "^3.917.0",
+    "@huggingface/inference": "^4.13.12",
+    "@langchain/community": "^1.1.15",
+    "@langchain/core": "^1.1.24",
+    "@langchain/google-genai": "^2.1.18",
     "bcryptjs": "^3.0.2",
     "cors": "^2.8.5",
-    "dotenv": "^17.2.3",
+    "dotenv": "^16.6.1",
     "express": "^5.1.0",
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.2",
+    "langchain": "^1.2.24",
     "mongoose": "^8.19.1",
     "morgan": "^1.10.1",
     "multer": "^2.0.2",
-    "multer-s3": "^3.0.1"
+    "multer-s3": "^3.0.1",
+    "socket.io": "^4.8.3"
   },
   "devDependencies": {
     "nodemon": "^3.1.10"

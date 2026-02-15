@@ -2,6 +2,10 @@ const Product = require("../models/Product");
 // const User = require("../models/User");
 const Category = require("../models/Category");
 
+const { HuggingFaceInferenceEmbeddings } = require("@langchain/community/embeddings/hf");
+const { ChatGoogleGenerativeAI } = require("@langchain/google-genai");
+
+
 
 
 
@@ -56,7 +60,7 @@ const createProduct = async (req, res) => {
       const newProduct = new Product({
          name: formData.name,
          brand: formData.brand,
-         category: formData.categoryId, // Fixed: using categoryId from frontend
+         category: formData.categoryId,
          subCategory: formData.subCategory,
          price: formData.price,
          description: formData.description,
@@ -70,7 +74,24 @@ const createProduct = async (req, res) => {
 
       // Save the product to the database
       const savedProduct = await newProduct.save();
+      console.log(`✅ Product saved: ${savedProduct.name}`);
 
+      // Generate embedding in background (non-blocking)
+      // This happens after response is sent to user
+      generateProductEmbedding(savedProduct)
+         .then(async ({ embedding, embeddingText }) => {
+            savedProduct.embedding = embedding;
+            savedProduct.embeddingText = embeddingText;
+            await savedProduct.save();
+            console.log(`✅ Generated embedding for: ${savedProduct.name}`);
+         })
+         .catch(err => {
+            console.error(`❌ Failed to generate embedding for ${savedProduct.name}:`, err.message);
+            // Product is still saved successfully, just without embedding
+            // Can be regenerated later by running: node scripts/generateEmbeddings.js
+         });
+
+      // Return success response immediately (don't wait for embedding)
       res.status(201).json({
          success: true,
          message: "Product created successfully",
@@ -89,8 +110,10 @@ const createProduct = async (req, res) => {
 
 
 const getProducts = async (req, res) => {
+   console.log("params", req.query)
    try {
       const {
+         all,
          category,
          subCategory,
          brand,
@@ -138,6 +161,9 @@ const getProducts = async (req, res) => {
       // Size type filter
       if (sizeType) {
          filter.sizeType = sizeType;
+      }
+      if (all) {
+         filter.all = all;
       }
 
       // Fabric filter

@@ -31,6 +31,11 @@ const productSchema = new mongoose.Schema(
             default: []
         },
         variants: [variantSchema],
+        embedding: {
+            type: [Number],
+            select: false // Don't return in normal queries (saves bandwidth)
+        },
+        embeddingText: String // Store what text was used for embedding
     },
     { timestamps: true }
 );
