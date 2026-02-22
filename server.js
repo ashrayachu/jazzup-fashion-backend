@@ -19,7 +19,7 @@ const PORT = process.env.PORT || 5000;
 // Initialize Socket.IO with CORS
 const io = new Server(server, {
     cors: {
-        origin: ["http://localhost:5173"],
+        origin: ["http://localhost:5173", process.env.FRONTEND_VITE_URL],
         methods: ["GET", "POST"],
         credentials: true,
     },
