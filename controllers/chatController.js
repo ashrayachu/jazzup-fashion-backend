@@ -231,7 +231,7 @@ ${contextInfo}`;
         ]);
 
         // Prepare product data with images for frontend
-        const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+        const frontendUrl = process.env.FRONTEND_VITE_URL || 'http://localhost:5173';
         const productData = relevantProducts.map(product => ({
             _id: product._id,
             name: product.name,
