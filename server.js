@@ -19,7 +19,7 @@ const PORT = process.env.PORT || 5000;
 // Initialize Socket.IO with CORS
 const io = new Server(server, {
     cors: {
-        origin: ["http://localhost:5173", process.env.FRONTEND_VITE_URL],
+        origin: ["http://localhost:5173", process.env.FRONTEND_VITE_URL, process.env.CLOUDFRONT_URL].filter(Boolean),
         methods: ["GET", "POST"],
         credentials: true,
     },
@@ -31,7 +31,7 @@ initializeChatHandlers(io);
 // Middlewares
 app.use(express.json());
 app.use(cors({
-    origin: ["http://localhost:5173", process.env.FRONTEND_VITE_URL],
+    origin: ["http://localhost:5173", process.env.FRONTEND_VITE_URL, process.env.CLOUDFRONT_URL].filter(Boolean),
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true
