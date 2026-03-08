@@ -20,7 +20,10 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
             cd jazzup-fashion-backend
+            git config pull.rebase false
             git pull origin main
             npm install
             pm2 restart jazzup-backend
