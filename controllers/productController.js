@@ -1,6 +1,7 @@
 const Product = require("../models/Product");
 // const User = require("../models/User");
 const Category = require("../models/Category");
+const { generateProductEmbedding } = require("../helpers/generateProductEmbedding");
 
 const { HuggingFaceInferenceEmbeddings } = require("@langchain/community/embeddings/hf");
 const { ChatGoogleGenerativeAI } = require("@langchain/google-genai");
