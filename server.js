@@ -36,13 +36,15 @@ app.use(cors({
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true
 }));
-app.use(helmet());
+app.use(helmet({
+    crossOriginResourcePolicy: false  // ← add this
+}));
 app.use(morgan("dev"));
 
 // Routes
 app.use("/api/auth", authRouter);
 app.use("/api/admin", adminRouter);
-app.use("/api", userRouter);:q
+app.use("/api", userRouter);
 app.use("/api/chat", chatRouter);
 
 
